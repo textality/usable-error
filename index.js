@@ -80,9 +80,18 @@ function checkOpts(parent, defaultMsg, props, opts) {
         if (!optsKeys.hasOwnProperty(k))
             throw new Error('customError: unknown option "' + k + '"');
     });
-    if (parent !== undefined &&  !(parent instanceof Error))
-        throw new Error('customError: opts.parent must be inherits Error.prototype!');
-    if (defaultMsg != undefined && !defaultMsg && typeof defaultMsg != 'string')
+    if (parent !== undefined) {
+        if (typeof parent == 'function') {
+            if (!(parent.prototype instanceof Error))
+                throw new Error('customError: opts.parent must be inherits Error.prototype!');
+        } else if (typeof parent == 'object') {
+            if (!(parent instanceof Error))
+                throw new Error('customError: opts.parent must be inherits Error.prototype!');
+        } else {
+            throw new Error('customError: parent must be a function or object that inherits Error class!');
+        }
+    }
+    if (defaultMsg != undefined && (!defaultMsg || typeof defaultMsg != 'string'))
         throw new Error('customError: opts.defaultMsg if present, must be a non-empty string!');
     if (props !== undefined && (!Array.isArray(props)))
         throw new Error('customError: opts.props must be a array!');
